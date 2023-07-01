@@ -1,7 +1,0 @@
-file = "cameraposition1.toml"
-
-[MqttInfo]
-host = 'localhost'
-id = 'RIGHT'
-topic = 'points'
-port = 1883
