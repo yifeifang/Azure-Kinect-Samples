@@ -1,0 +1,12 @@
+version: "0.1"
+services:
+  ubuntu18.04-build:
+    build: .
+    privileged: true
+    network_mode: host
+    environment:
+      - DISPLAY
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - .:/AZKinect
+    working_dir: /AZKinect
