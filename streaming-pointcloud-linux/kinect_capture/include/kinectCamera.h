@@ -38,12 +38,11 @@ public: //functions
 	bool isReady();
 	bool setReady(bool setReady);
 	bool disconnectCamera();
-	bool writeToml();
 	bool isSubordinate();
 
 private: //functions
 	inline void convertToEigen(std::vector<Eigen::Vector3f>& depthVec, int16_t*& xyzbuffer, size_t size) {
-		for (int i = 0; i < size; ++i) {
+		for (size_t i = 0; i < size; ++i) {
 			depthVec[i] = Eigen::Vector3f(xyzbuffer[i * 3 + 0], xyzbuffer[i * 3 + 1], xyzbuffer[i * 3 + 2]);
 		}
 	}

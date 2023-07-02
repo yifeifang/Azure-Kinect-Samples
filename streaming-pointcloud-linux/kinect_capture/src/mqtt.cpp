@@ -10,7 +10,7 @@ void stringToChar(char*& dest, std::string source) {
 	if (strlen(source.c_str())) {
 		size_t len = strlen(source.c_str()) + 1;
 		dest = new char[len];
-		strcpy_s(dest, len, source.c_str());
+		std::strcpy(dest, source.c_str());
 		dest[len - 1] = '\0';
 	}
 }
@@ -61,14 +61,14 @@ bool mqtt::create(char* host, char* topic, int port, char* id, void* userdata, i
 	delete[]this->topic;
 	delete[]this->id;
 	this->host = new char[strlen(host) + 1];
-	strcpy_s(this->host, (strlen(host) + 1), host);
+	strcpy(this->host, host);
 	this->topic = new char[strlen(topic) + 1];
-	strcpy_s(this->topic, (strlen(topic) + 1), topic);
+	strcpy(this->topic, topic);
 	this->port = port;
 	this->keepalive = keepalive;
 	this->clean_session = clean_session;
 	this->id = new char[strlen(id) + 1];
-	strcpy_s(this->id, (strlen(id) + 1), id);
+	strcpy(this->id, id);
 
 	return initMosquitto();
 }
@@ -147,35 +147,22 @@ bool mqtt::initMosquitto(void) {
 }
 
 /*
-ParseArgs takes in the section of toml that is relevant for mqtt info.
+setupParam takes in the section of toml that is relevant for mqtt info.
 It will create the variables right from the file and then initialize the values to those provided from the
 config.toml file.
 Returns the success or failure of init_mosquitto()
 */
-bool mqtt::ParseArgs(toml::Table table) {	
-	stringToChar(this->host, toml::get<toml::String>(table.at("host")));
-	stringToChar(this->id, toml::get<toml::String>(table.at("id")));
-	std::string topicString(toml::get<toml::String>(table.at("topic")));
+bool mqtt::setupParam() {	
+	stringToChar(this->host, "localhost");
+	stringToChar(this->id, "camera0");
+	std::string topicString("points");
 	topicString.append("/");
 	topicString.append(this->id);
 	stringToChar(this->topic, topicString);
 	std::cout << this->topic << std::endl;
-	this->port = (int)toml::get<toml::Integer>(table.at("port"));
-	
-	try {
-		this->keepalive = (int)toml::get<toml::Integer>(table.at("keepalive"));
-	}
-	catch (std::exception & e) {
-		e; //Removes unreferenced local veriable warning
-		this->keepalive = 60;
-	}
-	try {
-		this->clean_session = toml::get<toml::Boolean>(table.at("clean_session"));
-	}
-	catch (std::exception & e) {
-		e; //Removes unreferenced local veriable warning
-		this->clean_session = true;
-	}
+	this->port = 1883;
+    this->keepalive = 60;
+	this->clean_session = true;
 
 	return initMosquitto();
 }
@@ -232,10 +219,6 @@ void handle_camera_control(char* command) {
 	if (strcmp(command, COMMAND_SHUTDOWN) == 0) {
 		printf("Shutting down the application..\n");
 		camera.setDone(true);
-	}
-	else if (strcmp(command, COMMAND_SAVE) == 0) {
-		printf("Saving configuration - ");
-		camera.writeToml();
 	}
 	else if (strcmp(command, COMMAND_RESTART) == 0) {
 		printf("Restarting camera\n");

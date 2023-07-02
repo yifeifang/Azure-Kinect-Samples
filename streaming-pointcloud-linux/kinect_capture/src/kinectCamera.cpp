@@ -36,8 +36,7 @@ kinectCamera::kinectCamera() {
 Call the default constructor
 Apply the configuration supplied from cameraConfig to the camera's settings
 */
-kinectCamera::kinectCamera(cameraConfiguration cameraConfig) {
-	this->kinectCamera::kinectCamera();
+kinectCamera::kinectCamera(cameraConfiguration cameraConfig) : kinectCamera() {
 	this->deviceIndex = cameraConfig.deviceIndex;
 	this->color = cameraConfig.color;
 	this->kinectDeviceConfiguration.depth_mode = cameraConfig.depthMode;
@@ -113,45 +112,18 @@ Grab all of the configurations from the toml files and set the available values
 Also passes mqtt's table over so it can grab the configurations
 */
 bool kinectCamera::parseToml(mqtt& mosquittoWrapper) {
-	std::string settingsFile("settings");
-	settingsFile.append(std::to_string(this->deviceIndex));
-	settingsFile.append(".toml");
-	std::ifstream file(settingsFile.c_str());
-	if (!file.good()) {
-		std::cout << "kinectCamera::parseToml() Error reading settings file!\n" << std::endl;
-		std::cout << "File Name: " << settingsFile << std::endl;
-		return false;
-	}
-	toml::Data data = toml::parse(file);
-	file.close();
-
-	//Getting the translations/rotation file to be used
-	std::string cameraConfigFile = toml::get<toml::String>(data.at("file"));
-
 	//Passing over the [MqttInfo] section to the mosquittoWrapper
-	mosquittoWrapper.ParseArgs(toml::get<toml::Table>(data.at("MqttInfo")));
-
-	//Opening the cameraConfig File
-	file.open(cameraConfigFile, std::ios::in | std::ios::out);
-	if (!file.good()) {
-		std::cout << "kinectCamera::parseToml() Error reading camera position file!\n" << std::endl;
-		std::cout << "File Name: " << cameraConfigFile << std::endl;
-		return false;
-	}
-	data = toml::parse(file);
-	file.close();
-
+	mosquittoWrapper.setupParam();
 	//Grab the translation, rotation, min, max values off of the toml file
 	//min and max have to be multiplied by 1000 in order to scale down to mm (camera's units)
 	//Converts to floats here to take advantage of Eigen's librarys for rotation with quaterionf
-	toml::Table table = toml::get<toml::Table>(data.at("Camera"));
-	std::vector<std::int_least64_t> temp = toml::get<std::vector<toml::Integer>>(table.at("translation"));
+	std::vector<std::int_least64_t> temp{0, 0, 0};
 	this->transformation[0] += Eigen::Vector3f((float)temp[0], (float)temp[1], (float)temp[2]);
-	temp = toml::get<std::vector<toml::Integer>>(table.at("rotation"));
+	temp = {0, 0, 0};
 	this->transformation[1] += Eigen::Vector3f((float)temp[0], (float)temp[1], (float)temp[2]);
-	temp = toml::get<std::vector<toml::Integer>>(table.at("min"));
+	temp = {-2000, 0, -1500};
 	this->transformation[2] += Eigen::Vector3f((float)temp[0], (float)temp[1], (float)temp[2]);
-	temp = toml::get<std::vector<toml::Integer>>(table.at("max"));
+	temp = {2000, 2000, 2000};
 	this->transformation[3] += Eigen::Vector3f((float)temp[0], (float)temp[1], (float)temp[2]);
 
 	return true;
@@ -340,7 +312,7 @@ bool kinectCamera::processCaptureCamera(mqtt &mosquittoWrapper, char* topic) {
 	else {
 		pointCount = this->processCaptureDepthCamera();
 	}
-
+    // need fix 
 	if (pointCount != -1) {
 		size_t size = 0;
 		memcpy(&this->messageBuffer[size], &this->kinectDeviceCaptureTimeStamp, 8); // 8 is the sizeof(uint64_t)
@@ -471,32 +443,6 @@ bool kinectCamera::disconnectCamera() {
 	return true;
 }
 
-//-----KinectCamera writeToml------//
-/*
-The toml file has the device index attached to it as well
-Build up the toml file and open it
-
-Ensure the file is still there and parse the toml file to get the configFileName
-*/
-bool kinectCamera::writeToml() {
-	std::string settingsFile("settings");
-	settingsFile.append(std::to_string(this->deviceIndex));
-	settingsFile.append(".toml");
-	std::ifstream file(settingsFile.c_str());
-	if (!file.good()) {
-		std::cout << "kinectCamera::writeToml() Error reading settings file!" << std::endl;
-		std::cout << "File Name: " << settingsFile << std::endl;
-		return false;
-	}
-	toml::Data data = toml::parse(file);
-	file.close();
-
-	std::string cameraConfigFile = toml::get<toml::String>(data.at("file"));
-
-	//Visual feedback of the cameraConfigFile
-	std::cout << cameraConfigFile << std::endl;
-	return this->writeSection(cameraConfigFile, "Camera");
-}
 
 //-----KinectCamera isSubordinate------//
 /*
@@ -551,7 +497,7 @@ uint32_t kinectCamera::processCaptureColorCamera() {
 	this->vec = this->currentPoints.give_points();
 	size_t size = this->vec.size();
 
-	for (int i = 0; i < size; ++i) {
+	for (size_t i = 0; i < size; ++i) {
 		//Vector.data() gives the raw xyz array that the points are stored in
 		float* xyz = vec[i].data();
 		if (xyz[0] == 0.0 && xyz[1] == 0.0 && xyz[2] == 0.0) {
@@ -574,7 +520,7 @@ uint32_t kinectCamera::processCaptureColorCamera() {
 	k4a_image_release(this->kinectDeviceCaptureTransformedColorImage);
 	this->kinectDeviceCaptureColorImage = nullptr;
 	this->kinectDeviceCaptureTransformedColorImage = nullptr;
-	return (uint32_t)((this->smallDepth.size() / 3));
+	return (int64_t)((this->smallDepth.size() / 3));
 }
 
 //-----KinectCamera processCaptureDepthCamera------//
@@ -594,7 +540,7 @@ uint32_t kinectCamera::processCaptureDepthCamera() {
 	this->vec.shrink_to_fit();
 	this->vec = this->currentPoints.give_points();
 	size_t size = this->vec.size();
-	for (int i = 0; i < size; ++i) {
+	for (size_t i = 0; i < size; ++i) {
 		//Vector.data() gives the raw xyz array that the points are stored in
 		float* xyz = vec[i].data();
 		if (xyz[0] == 0.0 && xyz[1] == 0.0 && xyz[2] == 0.0) {

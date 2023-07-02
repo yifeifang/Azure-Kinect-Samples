@@ -1,6 +1,7 @@
 #pragma once
-#pragma once
 #include <stdio.h>
+#include <string>
+#include <iostream>
 #include <mosquitto.h>
 
 #define TOPIC_CAMERA_AVAILBLE "cameras/available"
@@ -43,7 +44,7 @@ public: //Functions
 	void finishMosquitto(void);
 	void initMqttLib(void);
 	bool initMosquitto(void);
-	bool ParseArgs(toml::Table table);
+	bool setupParam();
 	void subscribe(void);
 	void subscribe(char* topic, bool append = false);
 	std::string giveTopic();
