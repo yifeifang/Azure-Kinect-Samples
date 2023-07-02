@@ -1,5 +1,5 @@
 .PHONY kinect_capture:
-	$(MAKE) -f ./kinect_capture/Makefile
+	$(MAKE) -f ./kinect_capture/Makefile all
 .PHONY merger:
 .PHONY mqtt_visualizer:
 .PHONY setup:
