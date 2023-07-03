@@ -41,6 +41,7 @@ kinectCamera::kinectCamera(cameraConfiguration cameraConfig) : kinectCamera() {
 	this->color = cameraConfig.color;
 	this->kinectDeviceConfiguration.depth_mode = cameraConfig.depthMode;
 	this->kinectDeviceConfiguration.color_resolution = cameraConfig.colorResolution;
+	this->kinectDeviceConfiguration.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
 	//Make sure that the fps isn't greater than the max allowed for wfov_unbinned or 3072p for the cameras
 	if ((cameraConfig.depthMode == K4A_DEPTH_MODE_WFOV_UNBINNED || cameraConfig.colorResolution == K4A_COLOR_RESOLUTION_3072P) && cameraConfig.fpsMode == K4A_FRAMES_PER_SECOND_30) {
 		this->kinectDeviceConfiguration.camera_fps = K4A_FRAMES_PER_SECOND_15;

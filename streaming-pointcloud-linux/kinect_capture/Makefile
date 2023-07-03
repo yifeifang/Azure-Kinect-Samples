@@ -1,5 +1,5 @@
 include define.inc
-CFLAGS += -I./kinect_capture/include -std=c++17
+CFLAGS += -I./kinect_capture/include -std=c++17 -g -O0
 SRCDIR:=./kinect_capture/src
 BUILDDIR:=$(BUILD)/kinect_capture
 SOURCES:=$(wildcard $(SRCDIR)/*.cpp)  # this finds all the C source files under the source directory
@@ -10,7 +10,7 @@ $(info $$OBJECTS is [${OBJECTS}])
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp  # this defines a pattern rule for each object file
 	$(CC) $(CFLAGS) -c $< -o $@  # this compiles the source file ($<) to the object file ($@)
 
-.PHONY compile: $(OBJECTS)  # this defines the all target that depends on all the object files
+compile: $(OBJECTS)  # this defines the all target that depends on all the object files
 
 .PHONY link: compile
 	$(CC) $(OBJECTS) -L /usr/lib/x86_64-linux-gnu/ -lk4a -lmosquitto -o kinect_capture.out 

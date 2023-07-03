@@ -4,7 +4,8 @@
 #include "kinectCamera.h"
 
 mqtt mosquittoWrapper;
-kinectCamera camera;
+cameraConfiguration config;
+kinectCamera camera(config);
 
 int main(int argc, char* argv[])
 {
@@ -59,20 +60,24 @@ int main(int argc, char* argv[])
 			std::cout << "MASTER/STANDALONE mode." << std::endl;
 		}
 		std::cout << "Waiting for response from the merger" << std::endl;
-		do {
-			//Wait to get the configuration form the merger, send a message every second
-			mosquittoWrapper.sendMessage((int)topic.size(), topic.c_str(), (char*)TOPIC_CAMERA_AVAILBLE);
-			std::this_thread::sleep_for(std::chrono::seconds(1));
-		}  while (!camera.isReady() && !camera.isRestart());
+        mosquittoWrapper.sendMessage((int)topic.size(), topic.c_str(), (char*)TOPIC_CAMERA_AVAILBLE);
+		// do {
+		// 	//Wait to get the configuration form the merger, send a message every second
+		// 	mosquittoWrapper.sendMessage((int)topic.size(), topic.c_str(), (char*)TOPIC_CAMERA_AVAILBLE);
+		// 	std::this_thread::sleep_for(std::chrono::seconds(1));
+		// }  while (!camera.isReady() && !camera.isRestart());
 		//Check to see if the while loop was exited because of restarting, or because camera received
 		//the configuration from the merger
 		std::cout << "Starting capture" << std::endl;
-		if (!camera.isRestart()) {
-			//If it didn't leave because of restart, reset ready variable and start camera up
-			camera.setReady(false);
-			camera.startCamera();
-			camera.setCameraCalibrationandTransformation();
-		}
+        camera.setReady(false);
+        camera.startCamera();
+        camera.setCameraCalibrationandTransformation();
+		// if (!camera.isRestart()) {
+		// 	//If it didn't leave because of restart, reset ready variable and start camera up
+		// 	camera.setReady(false);
+		// 	camera.startCamera();
+		// 	camera.setCameraCalibrationandTransformation();
+		// }
 		//Main loop for capturing the image
 		while (!camera.isDone() && !camera.isRestart()) {
 			if (camera.takeCaptureCamera(timeoutMS)) {

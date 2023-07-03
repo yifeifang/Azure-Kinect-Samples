@@ -7,11 +7,10 @@
 
 struct cameraConfiguration {
 	int deviceIndex = 0;
-	bool color = false;
+	bool color = true;
 	k4a_depth_mode_t depthMode = K4A_DEPTH_MODE_NFOV_2X2BINNED;
 	k4a_color_resolution_t colorResolution = K4A_COLOR_RESOLUTION_720P;
 	k4a_fps_t fpsMode = K4A_FRAMES_PER_SECOND_30;
-
 };
 
 class kinectCamera {
