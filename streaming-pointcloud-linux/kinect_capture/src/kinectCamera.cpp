@@ -332,7 +332,7 @@ bool kinectCamera::processCaptureCamera(mqtt &mosquittoWrapper, char* topic) {
 
 		//Display the number of points sent.
 		
-		std::cout << "Points sent : " << pointCount << "                                        \r";
+		std::cout << "Points sent : " << pointCount << std::endl;
 	}  
 	else {
 		result = false;
