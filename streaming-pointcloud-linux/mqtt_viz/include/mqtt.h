@@ -1,8 +1,6 @@
 #pragma once
-#pragma once
 #include <stdio.h>
 #include <mosquitto.h>
-#include "..//packages/TOMLParser-master/toml.hpp"
 #include <mutex>
 
 #define TOPIC_CAMERA_AVAILBLE "cameras/available"
