@@ -5,6 +5,8 @@ kinect_capture:
 .PHONY: merger
 
 .PHONY: mqtt_visualizer
+mqtt_visualizer:
+	$(MAKE) -f ./mqtt_viz/Makefile all
 
 .PHONY: setup 
 setup:
