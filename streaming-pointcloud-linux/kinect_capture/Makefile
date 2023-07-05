@@ -12,7 +12,9 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp  # this defines a pattern rule for each object 
 
 compile: $(OBJECTS)  # this defines the all target that depends on all the object files
 
-.PHONY link: compile
+.PHONY: link
+link: compile
 	$(CC) $(OBJECTS) -L /usr/lib/x86_64-linux-gnu/ -lk4a -lmosquitto -o kinect_capture.out 
 
-.PHONY all: link
+.PHONY: all
+all: link
