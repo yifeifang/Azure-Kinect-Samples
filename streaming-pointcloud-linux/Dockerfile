@@ -6,10 +6,18 @@ RUN apt update && \
     apt install -y gnupg && \
     apt install -y software-properties-common && \
     apt install -y xauth && \
+# apt install -y cmake g++ wget unzip && \
     curl -sSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     apt-add-repository https://packages.microsoft.com/ubuntu/18.04/prod && \
     apt-add-repository ppa:mosquitto-dev/mosquitto-ppa && \
     rm -rf /var/lib/apt/lists/*
+
+# RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/4.x.zip && \
+#     unzip opencv.zip && \
+#     mkdir -p build && cd build && \
+#     cmake ../opencv-4.x && \
+#     cmake --build . && \
+#     make install
 
 RUN apt update && \
     ACCEPT_EULA=Y apt install -y libk4a1.4 && \

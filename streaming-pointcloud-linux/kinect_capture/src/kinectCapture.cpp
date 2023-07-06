@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 		//Main loop for capturing the image
 		while (!camera.isDone() && !camera.isRestart()) {
 			if (camera.takeCaptureCamera(timeoutMS)) {
-				camera.processCaptureCamera(mosquittoWrapper);
+				camera.processCaptureCamera(mosquittoWrapper, "points/windowViewer");
 			}
 		}
 		//Exit restart Loop
